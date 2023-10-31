@@ -1,0 +1,31 @@
+name: ARM Template Deploy Workflow
+
+on:
+  push:
+    branches: ['master']
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set up Azure CLI
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.25.0
+
+      - name: Deploy ARM Template
+        run: |
+          az deployment group create --resource-group YourResourceGroupName --template-file template.json
