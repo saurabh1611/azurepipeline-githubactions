@@ -5,13 +5,10 @@ on:
     branches: ['master']
   workflow_dispatch:
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -21,7 +18,23 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Create Resource Group
+        run: az group create --name DeployARM --location eastus
+
       - name: Deploy ARM Template
-        run: |
-          az group create --name DeployARM --location useast
-          az deployment group create --resource-group DeployARM --template-file template.json
+        run: az deployment group create --resource-group DeployARM --template-file template.json
+
+  destroy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Delete Resource Group
+        run: az group delete --name DeployARM --yes --no-wait
