@@ -23,4 +23,5 @@ jobs:
 
       - name: Deploy ARM Template
         run: |
+          az group create --name DeployARM --location useast
           az deployment group create --resource-group DeployARM --template-file template.json
